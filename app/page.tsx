@@ -9,9 +9,7 @@ export default function Home() {
     <main >
       <div>hello</div>
       <button onClick={() => setOpenShopWindow(true)}>click</button>
-      {openShopWindow && <ShopWindow {...
-        data.works[0]
-      } />}
+      {openShopWindow && <ShopWindow {...data.works[0]} onClose={() => setOpenShopWindow(false)} />}
     </main>
   )
 }
