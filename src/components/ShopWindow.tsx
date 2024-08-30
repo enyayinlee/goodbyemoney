@@ -4,6 +4,7 @@ import Close from '@mui/icons-material/Close';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import classnames from 'classnames';
+import { getScaledWH } from '../utils/utils';
 
 type Props = {
   title: string;
@@ -20,10 +21,32 @@ type Item = {
 const imgHost = 'https://images.plurk.com/';
 const imgHostsm = 'https://images.plurk.com/mx_';
 
-const Item = (props: { urlpre: string; link: string; altText: string; pre: string; onClick?: () => void }) => {
+const Item = (props: {
+  active?: boolean;
+  urlpre: string;
+  link: string;
+  altText: string;
+  pre: string;
+  onClick?: () => void;
+}) => {
+  const ref = useRef<HTMLImageElement>(null);
+  const [isHorizontal, setIsHorizontal] = useState(true);
+
+  useEffect(() => {
+    if (!!ref.current) {
+      setIsHorizontal(ref.current?.width > ref.current?.height);
+      console.log(ref.current.width, ref.current.height);
+    }
+  }, [ref.current?.width, ref.current?.height]);
+
   return (
-    <div className={`${props.pre}__item-container`} onClick={props.onClick}>
-      <img src={`${props.urlpre}${props.link}`} alt={props.altText} />
+    <div className={classnames(`${props.pre}__item-container`, { active: !!props.active })} onClick={props.onClick}>
+      <img
+        src={`${props.urlpre}${props.link}`}
+        alt={props.altText}
+        ref={ref}
+        className={classnames([{ horizontal: !!isHorizontal }, { vertical: !isHorizontal }])}
+      />
     </div>
   );
 };
@@ -43,12 +66,19 @@ const ShopWindowDisplay = ({
     return items.map((item, idx) => {
       const altText = `item-${idx}-${item.name}`;
       return (
-        <div key={altText}>
-          <Item urlpre={imgHostsm} link={item.link} altText={altText} pre={pre} onClick={() => onItemClick(idx)} />
-        </div>
+        <Item
+          key={altText}
+          urlpre={imgHostsm}
+          link={item.link}
+          altText={altText}
+          pre={pre}
+          onClick={() => onItemClick(idx)}
+          active={activeItem === idx}
+        />
       );
     });
   };
+
   return (
     <>
       <div className={prefix}>
